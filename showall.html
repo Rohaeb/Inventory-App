@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Current Inventory</title>
+    <script>
+        async function fetchAndDisplayData () {
+            try{
+                console.log("Starting fetch..."); // Log before the fetch call
+                const response = await fetch('http://localhost:3000/getDevices');
+                console.log("Response received:", response); // Log after the fetch call
+                const data = await response.json(); //parse response as JSON
+
+                const tableBody = document.getElementById('table-body');
+                tableBody.innerHTML = '';
+
+                data.forEach(device => {
+                    console.log(data);
+                    //create a row for each device
+                    const row = `
+                    <tr>
+                        <td>${device.id}</td>
+                        <td>${device.name}</td>
+                        <td>${device.Model}</td>
+                        <td>${device.Condition}</td>
+                        
+                    </tr>`;
+                    tableBody.innerHTML += row;
+                });
+            } catch (error) {
+                console.error('Error fetching data', error);
+            }
+        }
+ 
+
+
+        async function getDevice(idInput){
+            
+            try{
+                const response = await fetch(`http://localhost:3000/getDevicebyid?id=${idInput}`);
+                const data = await response.json();
+    
+                const form1= document.getElementById("form");
+                form1.innerHTML = "";
+                form1.innerHTML= `
+                <input type="text" id="device-id" value="${data[0].id}" readonly>
+                <input type="text" id="device-name" value="${data[0].name}">
+                <input type="text" id="device-Model" value="${data[0].Model}">
+                <input type="text" id="device-Condition" value="${data[0].Condition}">
+                <button id="saveButton" type="button" >Save Changes </button>
+                `;
+                document.getElementById("saveButton").addEventListener("click", updateDevice);
+
+                
+            }    catch (error) {
+                console.error('Error fetching data', error);
+            }
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchAndDisplayData(); // Load initial inventory table
+
+            document.getElementById('updateButton').addEventListener('click', (event) => {
+                event.preventDefault(); // Prevent form submission
+                const idInput = document.getElementById('id').value;
+                getDevice(idInput); // Fetch and display the device data
+            });
+        });
+
+        
+        async function updateDevice(){
+            const id = document.getElementById("device-id").value;
+            const newName =document.getElementById("device-name").value;
+            const newModel = document.getElementById("device-Model").value;
+            const newCondition = document.getElementById("device-Condition").value;
+            try{
+                const response = await fetch('http://localhost:3000/update',{
+                    method: 'POST', 
+                    headers: {'Content-Type': 'application/json' }, //specifies JSON data in the request
+                    body: JSON.stringify({id, name:newName, Model: newModel, Condition: newCondition }) //converts the input values into JSON format
+                
+                });
+                if (response.ok){
+                    alert("Changes saved")
+                    fetchAndDisplayData();
+                } else {
+                    alert("Error saving changes")
+                }
+                
+            } catch (error) {
+                console.error("error adding device", error)
+            }
+            document.getElementById("form").innerHTML="";
+        };
+        
+
+    </script>
+</head>
+<body>
+    <button onclick="location.href='index.html'">Home</button><br>
+    <h4>This is the current Inventory of HQ</h4>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Model</th>
+                <th>Condition</th>
+            </tr>
+        </thead>
+        <tbody id="table-body">
+                    <!-- Data will populate here dynamically-->
+        </tbody>
+    </table>
+    <script>
+        fetchAndDisplayData();
+    </script>
+    <h3>Need to update? Use form below!</h3>
+    <form onsubmit="event.preventDefault();">
+        <input id="id" placeholder="id" required>
+        <button id="updateButton" type="submit">Update Device</button>
+    </form>
+        <form id="form">
+
+        </form>
+    </form>
+</body>
+</html>
