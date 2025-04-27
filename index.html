@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Inventory</title>
+    <script>
+        // Function to send a POST request to add a device
+        async function addDevice() {
+            //collects input values from the form.
+            const name = document.getElementById('name').value;
+            const Model = document.getElementById('Model').value;
+            const Condition = document.getElementById('Condition').value;
+
+            try {
+                //sends the data to the server via POST request.
+                const response = await fetch('http://localhost:3000/inventory',{
+                    method: 'POST', 
+                    headers: {'Content-Type': 'application/json' }, //specifies JSON data in the request
+                    body: JSON.stringify({name, Model, Condition }) //converts the input values into JSON format
+        
+                });
+                if (response.ok) {
+                    alert('Device Addedd Sucessfully!');
+                } else {
+                    alert('Failed to add device.');
+                }
+            } catch (error) {
+                console.error('Error adding device:', error); //logs error to the console
+            }
+        }
+
+        async function removeDevice(){
+            const id = document.getElementById('id').value;
+             try{
+                const response = await fetch ('http://localhost:3000/remove',{
+                    method: 'DELETE',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({id})
+
+                });
+            if (response.ok) {
+            alert('Device removed');
+             } else {
+                alert('Failed to remove device');
+             }
+            } catch (error){
+                console.error('Error removing device:',error);
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Device Inventory</h1>
+    <button onclick="location.href='showall.html'">All devices</button><br>
+    <button onclick="location.href='repair.html'">Devices under Repair</button>
+    <h3>For adding a new device into inventory, please use form below</h3>
+    <form onsubmit="event.preventDefault(); addDevice();">
+        <input id="name" placeholder="Device Name" required>
+        <input id="Model" placeholder="Device Model" required>
+        <input id="Condition" placeholder="Condition [Mint, Fair, Worn-out]" required>
+        <button type="submit">Add Device</button>
+    </form> <br><Br>
+        <h3> Please use form below to remove device</h3>
+    <form onsubmit="event.preventDefault(); removeDevice();">
+        <input id="id" placeholder="id" required>
+        <button type="submit">Remove Device</button>
+    </form>
+</body>
+</html>
