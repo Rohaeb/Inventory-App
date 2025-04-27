@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+    
+        async function repairDevice (){
+            const devicename = document.getElementById("devicerName").value;
+            const deviceModel = document.getElementById("devicerModel").value;
+            const notes = document.getElementById("Notes").value;
+            const deviceImage = document.getElementById("deviceImage").value;
+
+            try{
+                const response = await fetch ('http://localhost:3000/repair',{
+                method: 'POST', 
+                headers: {'Content-Type': 'application/json' }, //specifies JSON data in the request
+                body: JSON.stringify({name, Model, Notes, deviceImage}) //converts the input values into JSON format
+                });
+                if (response.ok){
+                    alert('device added sucessfully');
+                } else {
+                    alert("Failed to add device");
+                }
+            } catch (error) {
+                console.error("Error adding device", error);
+            }
+        }
+    </script>
+</head>
+<body>
+    <h3>Create Device Repair report</h3>
+    <button onclick="location.href='index.html'">Home</button><br>
+    <form id="repairForm" onsubmit="event.preventDefault(); repairDevice();" ><br>
+        <input id="devicerName" placeholder="Name" required>
+        <input id="devicerModel" placeholder="Model" required><br><br>
+        <textarea id="notes" placeholder="Notes"></textarea><br><br>
+        <input type="file" id="deviceImage" name="deviceImage" accept="image/*"><br><br>
+        <button id="submit">Submit</button>
+    </form>
+    <h3> Current devices under repair</h3>
+    
+</body>
+</html>
